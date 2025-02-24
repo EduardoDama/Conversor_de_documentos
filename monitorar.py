@@ -7,6 +7,7 @@ import comtypes.client
 from plyer import notification
 from datetime import datetime
 from pathlib import Path
+import aspose.words as aw
 
 class MeuManipulador(FileSystemEventHandler):
     def __init__(self, converter, convertido, copia):
@@ -24,6 +25,11 @@ class MeuManipulador(FileSystemEventHandler):
                 pdf_to_docx(event.src_path, self.caminho_convertido, nome, self.caminho_copia)
             elif tipo in [".docx", ".doc"]:
                 docx_to_pdf(event.src_path, self.caminho_convertido, nome, self.caminho_copia)
+            elif tipo == ".jpg":
+                img_to_pdf(event.src_path, self.caminho_convertido, nome, self.caminho_copia, '.jpg')
+            elif tipo == '.png':
+                img_to_pdf(event.src_path, self.caminho_convertido, nome, self.caminho_copia, '.png')
+
 
 def tipoArq(caminho_arq):
     nome, extensao = os.path.splitext(os.path.basename(caminho_arq))
@@ -60,6 +66,18 @@ def docx_to_pdf(caminho_arq, caminho_convertido, nome, caminho_copia):
         mover_arquivo(caminho_arq, caminho_copia, nome + ".docx")
     except Exception:
         notificar('ERRO', 'Erro ao converter DOCX para PDF. TENTE NOVAMENTE')
+
+def img_to_pdf(caminho_arq, caminho_convertido, nome, caminho_copia, extensao):
+    try:
+        doc = aw.Document()
+        builder = aw.DocumentBuilder(doc)
+        builder.insert_image(caminho_arq)
+        doc.save(os.path.join(caminho_convertido, nome + ".pdf"))
+
+        mover_arquivo(caminho_arq, caminho_copia, nome + extensao)
+    except Exception:
+        notificar('ERRO', f'Erro ao converter {extensao.upper} para PDF. TENTE NOVAMENTE')
+
 
 def mover_arquivo(caminho_arq, caminho_copia, novo_nome):
     """Move o arquivo para a pasta de cópias, evitando erros."""
@@ -107,16 +125,16 @@ def verifpasta():
     return caminho_das_pastas
 
 def iniciar_monitoramento(pastas):
-    while True:  # Loop infinito para manter o programa rodando sempre
+    while True:  
         try:
             monitor = MeuManipulador(converter=pastas[0], convertido=pastas[1], copia=pastas[2])
             observer = Observer()
             observer.schedule(monitor, path=monitor.caminho_converter, recursive=False)
             observer.start()
-            observer.join()  # Aguarda eventos indefinidamente
+            observer.join()   
         except Exception as e:
             notificar('ERRO MONITORAR PASTA', 'ocorreu um erro na monitoração da pasta converter. Verifique se ela existe')
-            time.sleep(5)  # Aguarda 5 segundos antes de tentar reiniciar
+            time.sleep(5)  
 
 if __name__ == '__main__':
     pastas = verifpasta()
