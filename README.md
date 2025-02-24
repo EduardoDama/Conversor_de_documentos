@@ -1,0 +1,2 @@
+# Conversor_de_documentos
+ Este código é um monitor de pasta que observa uma pasta específica (chamada "Converter") na área de trabalho. Quando um arquivo PDF ou DOCX é adicionado a essa pasta, ele automaticamente converte o arquivo para o formato oposto (PDF para DOCX ou DOCX para PDF) e move o arquivo original para uma pasta de cópias ("Copias"). Os arquivos convertidos são salvos em uma pasta chamada "Convertido". Além disso, o código verifica e remove arquivos antigos (com mais de 7 dias) nas pastas "Convertido" e "Copias"
